@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 const BOARD_HEIGHT = visualViewport.height;
 const BIRD_SIZE = BOARD_HEIGHT / 10;
 const GRAVITY = 10;
-const BIRD_ROTATION_SPEED = GRAVITY / 20;
+const BIRD_ROTATION_SPEED = GRAVITY / 10;
 const JUMP_HEIGHT = BIRD_SIZE;
 const SPIKES_HEIGHT = BOARD_HEIGHT / 10;
 
@@ -15,29 +15,35 @@ function Game() {
     BOARD_HEIGHT / 2 - BIRD_SIZE
   );
   const [birdRotation, setBirdRotation] = useState(0);
+  const [gameHasStarted, setGameHasStarted] = useState(false);
 
   useEffect(() => {
     let timeId: NodeJS.Timer;
-    if (birdTopPosition < BOARD_HEIGHT - BIRD_SIZE) {
+    if (gameHasStarted && birdTopPosition < BOARD_HEIGHT - BIRD_SIZE) {
       timeId = setInterval(() => {
         setBirdTopPosition((birdTopPosition) => birdTopPosition + GRAVITY);
-        setBirdRotation((birdRotation) => birdRotation + BIRD_ROTATION_SPEED);
+        setBirdRotation((birdRotation) => {
+          if (birdRotation > 60) return 60;
+          return birdRotation + BIRD_ROTATION_SPEED;
+        });
       }, 24);
-    }
-    if (birdRotation > 0) {
-      return () => {
-        clearInterval(timeId);
-      };
     }
     return () => {
       clearInterval(timeId);
     };
-  });
+  }, [birdRotation, birdTopPosition, gameHasStarted]);
 
   const handleClick = () => {
     let newBirdTopPosition = birdTopPosition - JUMP_HEIGHT;
-    setBirdTopPosition(newBirdTopPosition);
-    setBirdRotation((birdRotation) => birdRotation + BIRD_ROTATION_SPEED * 2);
+    if (!gameHasStarted) {
+      setGameHasStarted(true);
+    } else if (newBirdTopPosition < SPIKES_HEIGHT / 4) {
+      setBirdTopPosition(SPIKES_HEIGHT / 4);
+      setBirdRotation(-45);
+    } else {
+      setBirdTopPosition(newBirdTopPosition);
+      setBirdRotation(-45);
+    }
   };
 
   return (
