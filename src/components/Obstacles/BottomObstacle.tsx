@@ -21,29 +21,4 @@ const BottomObstacle = (props: BottomObstacleProps) => {
   );
 };
 
-// const BottomObstacle = (props: BottomObstacleProps) => {
-//   return (
-//     <StyledBottomObstacle
-//       height={props.height}
-//       width={props.width}
-//       left={props.left}
-//     />
-//   );
-// };
-
-// const StyledBottomObstacle = styled.div<{
-//   height: number;
-//   width: number;
-//   left: number;
-// }>`
-//   position: absolute;
-//   z-index: 2;
-//   height: ${(props) => props.height}px;
-//   background-image: url(${obstacle});
-//   background-size: cover;
-//   width: ${(props) => props.width}px;
-//   bottom: 0;
-//   left: ${(props) => props.left}px;
-// `;
-
 export default BottomObstacle;
