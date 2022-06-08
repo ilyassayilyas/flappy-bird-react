@@ -1,27 +1,27 @@
-import styled from "styled-components";
-import birdGif from "../../img/Bird.gif";
+import style from "../styles/StaticStyling.module.css";
 
 type BirdProps = {
   size: number;
   top: number;
   rotation: number;
+  left: number;
 };
+
+const dynamicStyles = (props: BirdProps) => ({
+  height: `${props.size}px`,
+  width: `${props.size}px`,
+  transform: `rotate(${props.rotation}deg`,
+  top: `${props.top}px`,
+  left: `${props.left}px`,
+});
 
 const Bird = (props: BirdProps) => {
   return (
-    <StyledBird size={props.size} top={props.top} rotation={props.rotation} />
+    <div
+      className={style.bird}
+      style={dynamicStyles(props) as React.CSSProperties}
+    ></div>
   );
 };
-
-const StyledBird = styled.div<{ size: number; top: number; rotation: number }>`
-  height: ${(props) => props.size}px;
-  width: ${(props) => props.size}px;
-  background-image: url(${birdGif});
-  background-size: cover;
-  position: absolute;
-  transform: rotate(${(props) => props.rotation}deg);
-  top: ${(props) => props.top}px;
-  left: calc(1.5 * ${(props) => props.size}px);
-`;
 
 export default Bird;

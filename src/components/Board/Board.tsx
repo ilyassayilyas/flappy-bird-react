@@ -39,6 +39,7 @@ const BackgroundTopSpikes = styled.div<{ spikesHeight: number }>`
 `;
 
 const BackgroundBottomSpikes = styled.div<{ spikesHeight: number }>`
+  z-index: 1;
   position: absolute;
   bottom: 0;
   transform: rotate(180deg);

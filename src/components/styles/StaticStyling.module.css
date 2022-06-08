@@ -1,0 +1,22 @@
+.bird {
+  z-index: 3;
+  background-image: url("../../img/Bird.gif");
+  background-size: cover;
+  position: absolute;
+}
+
+.topObstacle {
+  transform: rotate(180deg);
+  position: absolute;
+  background-image: url("../../img/obstacle.gif");
+  background-size: cover;
+  top: 0;
+}
+
+.bottomObstacle {
+  position: absolute;
+  background-image: url("../../img/obstacle.gif");
+  background-size: cover;
+  bottom: 0;
+  z-index: 2;
+}
