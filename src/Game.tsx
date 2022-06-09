@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import TopObstacle from "./components/Obstacles/TopObstacle";
 import BottomObstacle from "./components/Obstacles/BottomObstacle";
 
-const GRAVITY = 15;
+const GRAVITY = 20;
 
 const BOARD_HEIGHT = visualViewport.height;
 const BOARD_WIDTH = visualViewport.width;
@@ -13,32 +13,53 @@ const SPIKES_HEIGHT = BOARD_HEIGHT / 10;
 
 const BIRD_SIZE = BOARD_HEIGHT / 10;
 const BIRD_ROTATION_SPEED = GRAVITY / 10;
-const JUMP_HEIGHT = BIRD_SIZE;
+const JUMP_HEIGHT = BIRD_SIZE * 1.5;
 const BIRID_LEFT_POSITION = BIRD_SIZE;
 
-const GAP = BIRD_SIZE * 2;
+const GAP = BIRD_SIZE * 3;
 const OBSTACLE_WIDTH = BIRD_SIZE * 3;
-const OBSTACLES_SPEED = 3;
+const OBSTACLES_SPEED = 15;
 
 function Game() {
+  const minObstacleHeight = 400;
+  const maxObstacleHeight = Math.floor(Math.random() * (BOARD_HEIGHT / 1.75));
+
   const [birdTopPosition, setBirdTopPosition] = useState(
     BOARD_HEIGHT / 2 - BIRD_SIZE
   );
   const [birdRotation, setBirdRotation] = useState(0);
+
   const [gameHasStarted, setGameHasStarted] = useState(false);
 
   const [topObstacleHeight, setTopObstacleHeight] = useState(BOARD_HEIGHT / 2);
   const [obstacleLeft, setObstacleLeft] = useState(
     BOARD_WIDTH + OBSTACLE_WIDTH
   );
+  let bottomObstacleHeight = BOARD_HEIGHT - GAP - topObstacleHeight;
+
   const [secondTopObstacleHeight, setSecondTopObstacleHeight] = useState(
     BOARD_HEIGHT / 4
   );
   let secondBottomObstacleHeight = BOARD_HEIGHT - GAP - secondTopObstacleHeight;
   const [secondObstacleLeft, setSecondObstacleLeft] = useState(
-    obstacleLeft + 2 * OBSTACLE_WIDTH
+    BOARD_WIDTH + 2.75 * OBSTACLE_WIDTH
   );
-  let bottomObstacleHeight = BOARD_HEIGHT - GAP - topObstacleHeight;
+
+  const [thirdTopObstacleHeight, setThirdTopObstacleHeight] = useState(
+    BOARD_HEIGHT / 3
+  );
+  let thirdBottomObstacleHeight = BOARD_HEIGHT - GAP - thirdTopObstacleHeight;
+  const [thirdObstacleLeft, setThirdObstacleLeft] = useState(
+    BOARD_WIDTH + 4.5 * OBSTACLE_WIDTH
+  );
+
+  const [fourthTopObstacleHeight, setFourthTopObstacleHeight] = useState(
+    BOARD_HEIGHT / 5
+  );
+  let fourthBottomObstacleHeight = BOARD_HEIGHT - GAP - fourthTopObstacleHeight;
+  const [fourthObstacleLeft, setFourthObstacleLeft] = useState(
+    BOARD_WIDTH + 6.25 * OBSTACLE_WIDTH
+  );
 
   useEffect(() => {
     let timeId: NodeJS.Timer;
@@ -67,9 +88,7 @@ function Game() {
       };
     } else if (obstacleLeft < 0) {
       setObstacleLeft(BOARD_WIDTH);
-      setTopObstacleHeight(
-        Math.max(Math.floor(Math.random() * (BOARD_HEIGHT - GAP)), 250)
-      );
+      setTopObstacleHeight(Math.max(maxObstacleHeight, minObstacleHeight));
     }
   }, [gameHasStarted, obstacleLeft]);
 
@@ -85,12 +104,48 @@ function Game() {
         clearInterval(timeId);
       };
     } else if (secondObstacleLeft < 0) {
-      setSecondObstacleLeft(BOARD_WIDTH + OBSTACLE_WIDTH);
+      setSecondObstacleLeft(BOARD_WIDTH);
       setSecondTopObstacleHeight(
-        Math.max(Math.floor(Math.random() * (BOARD_HEIGHT - GAP)), 250)
+        Math.max(maxObstacleHeight, minObstacleHeight)
       );
     }
   }, [gameHasStarted, secondObstacleLeft]);
+
+  useEffect(() => {
+    let timeId: NodeJS.Timer;
+    if (gameHasStarted && thirdObstacleLeft >= -OBSTACLE_WIDTH) {
+      timeId = setInterval(() => {
+        setThirdObstacleLeft(
+          (thirdObstacleLeft) => thirdObstacleLeft - OBSTACLES_SPEED
+        );
+      }, 24);
+      return () => {
+        clearInterval(timeId);
+      };
+    } else if (thirdObstacleLeft < 0) {
+      setThirdObstacleLeft(BOARD_WIDTH);
+      setThirdTopObstacleHeight(Math.max(maxObstacleHeight, minObstacleHeight));
+    }
+  }, [gameHasStarted, thirdObstacleLeft]);
+
+  useEffect(() => {
+    let timeId: NodeJS.Timer;
+    if (gameHasStarted && fourthObstacleLeft >= -OBSTACLE_WIDTH) {
+      timeId = setInterval(() => {
+        setFourthObstacleLeft(
+          (fourthObstacleLeft) => fourthObstacleLeft - OBSTACLES_SPEED
+        );
+      }, 24);
+      return () => {
+        clearInterval(timeId);
+      };
+    } else if (fourthObstacleLeft < 0) {
+      setFourthObstacleLeft(BOARD_WIDTH);
+      setFourthTopObstacleHeight(
+        Math.max(maxObstacleHeight, minObstacleHeight)
+      );
+    }
+  }, [gameHasStarted, fourthObstacleLeft]);
 
   const handleClick = () => {
     let newBirdTopPosition = birdTopPosition - JUMP_HEIGHT;
@@ -118,11 +173,31 @@ function Game() {
           width={OBSTACLE_WIDTH}
           left={secondObstacleLeft}
         />
+        <TopObstacle
+          height={thirdTopObstacleHeight}
+          width={OBSTACLE_WIDTH}
+          left={thirdObstacleLeft}
+        />
+        <TopObstacle
+          height={fourthTopObstacleHeight}
+          width={OBSTACLE_WIDTH}
+          left={fourthObstacleLeft}
+        />
         <Bird
           size={BIRD_SIZE}
           top={birdTopPosition}
           left={BIRID_LEFT_POSITION}
           rotation={birdRotation}
+        />
+        <BottomObstacle
+          height={fourthBottomObstacleHeight}
+          width={OBSTACLE_WIDTH}
+          left={fourthObstacleLeft}
+        />
+        <BottomObstacle
+          height={thirdBottomObstacleHeight}
+          width={OBSTACLE_WIDTH}
+          left={thirdObstacleLeft}
         />
         <BottomObstacle
           height={secondBottomObstacleHeight}
