@@ -4,6 +4,9 @@ import Board from "./components/Board/Board";
 import { useState, useEffect } from "react";
 import TopObstacle from "./components/Obstacles/TopObstacle";
 import BottomObstacle from "./components/Obstacles/BottomObstacle";
+import ScoreKeeper from "./components/ScoreKeeper/ScoreKeeper";
+import StartMenu from "./components/menu/StartMenu";
+import style from "./components/styles/StaticStyling.module.css";
 
 const GRAVITY = 20;
 
@@ -20,6 +23,9 @@ const GAP = BIRD_SIZE * 3;
 const OBSTACLE_WIDTH = BIRD_SIZE * 3;
 const OBSTACLES_SPEED = 15;
 
+const MENU_HEIGHT = BOARD_HEIGHT / 3;
+const MENU_WIDTH = BOARD_WIDTH / 5;
+
 function Game() {
   const minObstacleHeight = 400;
   const maxObstacleHeight = Math.floor(Math.random() * (BOARD_HEIGHT / 1.75));
@@ -30,6 +36,9 @@ function Game() {
   const [birdRotation, setBirdRotation] = useState(0);
 
   const [gameHasStarted, setGameHasStarted] = useState(false);
+  const [gameHasOver, setGameHasOver] = useState(false);
+  const [menuVisibility, setMenuVisibility] = useState("flex");
+  const [score, setScore] = useState(0);
 
   const [topObstacleHeight, setTopObstacleHeight] = useState(BOARD_HEIGHT / 2);
   const [obstacleLeft, setObstacleLeft] = useState(
@@ -63,22 +72,6 @@ function Game() {
 
   useEffect(() => {
     let timeId: NodeJS.Timer;
-    if (gameHasStarted && birdTopPosition < BOARD_HEIGHT - BIRD_SIZE) {
-      timeId = setInterval(() => {
-        setBirdTopPosition((birdTopPosition) => birdTopPosition + GRAVITY);
-        setBirdRotation((birdRotation) => {
-          if (birdRotation > 60) return 60;
-          return birdRotation + BIRD_ROTATION_SPEED;
-        });
-      }, 24);
-    }
-    return () => {
-      clearInterval(timeId);
-    };
-  }, [birdRotation, birdTopPosition, gameHasStarted]);
-
-  useEffect(() => {
-    let timeId: NodeJS.Timer;
     if (gameHasStarted && obstacleLeft >= -OBSTACLE_WIDTH) {
       timeId = setInterval(() => {
         setObstacleLeft((obstacleLeft) => obstacleLeft - OBSTACLES_SPEED);
@@ -87,10 +80,11 @@ function Game() {
         clearInterval(timeId);
       };
     } else if (obstacleLeft < 0) {
+      setScore((score) => score + 1);
       setObstacleLeft(BOARD_WIDTH);
       setTopObstacleHeight(Math.max(maxObstacleHeight, minObstacleHeight));
     }
-  }, [gameHasStarted, obstacleLeft]);
+  }, [gameHasStarted, obstacleLeft, maxObstacleHeight]);
 
   useEffect(() => {
     let timeId: NodeJS.Timer;
@@ -104,12 +98,13 @@ function Game() {
         clearInterval(timeId);
       };
     } else if (secondObstacleLeft < 0) {
+      setScore((score) => score + 1);
       setSecondObstacleLeft(BOARD_WIDTH);
       setSecondTopObstacleHeight(
         Math.max(maxObstacleHeight, minObstacleHeight)
       );
     }
-  }, [gameHasStarted, secondObstacleLeft]);
+  }, [gameHasStarted, secondObstacleLeft, maxObstacleHeight]);
 
   useEffect(() => {
     let timeId: NodeJS.Timer;
@@ -123,10 +118,11 @@ function Game() {
         clearInterval(timeId);
       };
     } else if (thirdObstacleLeft < 0) {
+      setScore((score) => score + 1);
       setThirdObstacleLeft(BOARD_WIDTH);
       setThirdTopObstacleHeight(Math.max(maxObstacleHeight, minObstacleHeight));
     }
-  }, [gameHasStarted, thirdObstacleLeft]);
+  }, [gameHasStarted, thirdObstacleLeft, maxObstacleHeight]);
 
   useEffect(() => {
     let timeId: NodeJS.Timer;
@@ -140,23 +136,160 @@ function Game() {
         clearInterval(timeId);
       };
     } else if (fourthObstacleLeft < 0) {
+      setScore((score) => score + 1);
       setFourthObstacleLeft(BOARD_WIDTH);
       setFourthTopObstacleHeight(
         Math.max(maxObstacleHeight, minObstacleHeight)
       );
     }
-  }, [gameHasStarted, fourthObstacleLeft]);
+  }, [gameHasStarted, fourthObstacleLeft, maxObstacleHeight]);
+
+  useEffect(() => {
+    const isFirstTopCollision =
+      birdTopPosition >= 0 &&
+      birdTopPosition < topObstacleHeight - 0.0625 * BIRD_SIZE;
+    const isFirstBottomCollision =
+      birdTopPosition <= BOARD_HEIGHT &&
+      birdTopPosition > BOARD_HEIGHT - bottomObstacleHeight - BIRD_SIZE / 1.5;
+    if (
+      obstacleLeft >= BIRID_LEFT_POSITION - 1.5 * BIRD_SIZE &&
+      obstacleLeft <= OBSTACLE_WIDTH - 1.5 * BIRID_LEFT_POSITION &&
+      (isFirstBottomCollision || isFirstTopCollision)
+    ) {
+      setGameHasOver(true);
+      setGameHasStarted(false);
+    }
+  }, [
+    obstacleLeft,
+    bottomObstacleHeight,
+    topObstacleHeight,
+    birdTopPosition,
+    gameHasOver,
+  ]);
+
+  useEffect(() => {
+    const isSecondTopCollision =
+      birdTopPosition >= 0 &&
+      birdTopPosition < secondTopObstacleHeight - 0.0625 * BIRD_SIZE;
+    const isSecondBottomCollision =
+      birdTopPosition <= BOARD_HEIGHT &&
+      birdTopPosition >
+        BOARD_HEIGHT - secondBottomObstacleHeight - BIRD_SIZE / 1.5;
+    if (
+      secondObstacleLeft >= BIRID_LEFT_POSITION - 1.5 * BIRD_SIZE &&
+      secondObstacleLeft <= OBSTACLE_WIDTH - 1.5 * BIRID_LEFT_POSITION &&
+      (isSecondBottomCollision || isSecondTopCollision)
+    ) {
+      setGameHasOver(true);
+      setGameHasStarted(false);
+    }
+  }, [
+    secondObstacleLeft,
+    secondBottomObstacleHeight,
+    secondTopObstacleHeight,
+    birdTopPosition,
+    gameHasOver,
+  ]);
+
+  useEffect(() => {
+    const isThirdTopCollision =
+      birdTopPosition >= 0 &&
+      birdTopPosition < thirdTopObstacleHeight - 0.0625 * BIRD_SIZE;
+    const isThirdBottomCollision =
+      birdTopPosition <= BOARD_HEIGHT &&
+      birdTopPosition >
+        BOARD_HEIGHT - thirdBottomObstacleHeight - BIRD_SIZE / 1.5;
+    if (
+      thirdObstacleLeft >= BIRID_LEFT_POSITION - 1.5 * BIRD_SIZE &&
+      thirdObstacleLeft <= OBSTACLE_WIDTH - 1.5 * BIRID_LEFT_POSITION &&
+      (isThirdBottomCollision || isThirdTopCollision)
+    ) {
+      setGameHasOver(true);
+      setGameHasStarted(false);
+    }
+  }, [
+    thirdObstacleLeft,
+    thirdBottomObstacleHeight,
+    thirdTopObstacleHeight,
+    birdTopPosition,
+    gameHasOver,
+  ]);
+
+  useEffect(() => {
+    const isFourthTopCollision =
+      birdTopPosition >= 0 &&
+      birdTopPosition < fourthTopObstacleHeight - 0.0625 * BIRD_SIZE;
+    const isFourthBottomCollision =
+      birdTopPosition <= BOARD_HEIGHT &&
+      birdTopPosition >
+        BOARD_HEIGHT - fourthBottomObstacleHeight - BIRD_SIZE / 1.5;
+    if (
+      fourthObstacleLeft >= BIRID_LEFT_POSITION - 1.5 * BIRD_SIZE &&
+      fourthObstacleLeft <= OBSTACLE_WIDTH - 1.5 * BIRID_LEFT_POSITION &&
+      (isFourthBottomCollision || isFourthTopCollision)
+    ) {
+      setGameHasOver(true);
+      setGameHasStarted(false);
+    }
+  }, [
+    fourthObstacleLeft,
+    fourthBottomObstacleHeight,
+    fourthTopObstacleHeight,
+    birdTopPosition,
+    gameHasOver,
+  ]);
+
+  useEffect(() => {
+    if (gameHasOver) {
+      setMenuVisibility("flex");
+      setScore(0);
+    }
+  }, [gameHasOver]);
+
+  useEffect(() => {
+    if (!gameHasStarted) {
+      setMenuVisibility("flex");
+    } else {
+      setMenuVisibility("none");
+    }
+  }, [gameHasStarted]);
+
+  useEffect(() => {
+    let timeId: NodeJS.Timer;
+    if (gameHasStarted && birdTopPosition < BOARD_HEIGHT - BIRD_SIZE) {
+      timeId = setInterval(() => {
+        setBirdTopPosition((birdTopPosition) => birdTopPosition + GRAVITY);
+        setBirdRotation((birdRotation) => {
+          if (birdRotation > 60) return 60;
+          return birdRotation + BIRD_ROTATION_SPEED;
+        });
+      }, 24);
+    }
+    return () => {
+      clearInterval(timeId);
+    };
+  }, [gameHasStarted, birdRotation, birdTopPosition]);
 
   const handleClick = () => {
     let newBirdTopPosition = birdTopPosition - JUMP_HEIGHT;
-    if (!gameHasStarted) {
+    if (!gameHasOver && gameHasStarted) {
+      if (newBirdTopPosition < SPIKES_HEIGHT / 4) {
+        setBirdTopPosition(SPIKES_HEIGHT / 4);
+        setBirdRotation(-45);
+      } else {
+        setBirdTopPosition(newBirdTopPosition);
+        setBirdRotation(-45);
+      }
+    }
+  };
+
+  const handleButtonClick = () => {
+    if (!gameHasStarted && !gameHasOver) {
       setGameHasStarted(true);
-    } else if (newBirdTopPosition < SPIKES_HEIGHT / 4) {
-      setBirdTopPosition(SPIKES_HEIGHT / 4);
-      setBirdRotation(-45);
-    } else {
-      setBirdTopPosition(newBirdTopPosition);
-      setBirdRotation(-45);
+    }
+    if (gameHasOver) {
+      setGameHasOver(false);
+      setGameHasStarted(true);
     }
   };
 
@@ -183,6 +316,19 @@ function Game() {
           width={OBSTACLE_WIDTH}
           left={fourthObstacleLeft}
         />
+        <StartMenu
+          height={MENU_HEIGHT}
+          width={MENU_WIDTH}
+          display={menuVisibility}
+        >
+          <h1 className={style.menuHeading}>
+            {gameHasOver ? "Game Over" : "New Game"}
+          </h1>
+          <button className={style.menuBtn} onClick={handleButtonClick}>
+            {gameHasOver ? "Restart" : "Start"}
+          </button>
+        </StartMenu>
+        <ScoreKeeper score={score} />
         <Bird
           size={BIRD_SIZE}
           top={birdTopPosition}
