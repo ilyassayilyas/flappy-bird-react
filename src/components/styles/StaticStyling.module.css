@@ -46,27 +46,6 @@
   width: 100%;
 }
 
-.topSpikes {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-image: url("../../img/spikes.gif");
-  background-size: contain;
-  background-repeat: repeat-x;
-  width: 100%;
-}
-
-.bottomSpikes {
-  z-index: 1;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  transform: rotate(180deg);
-  background-size: contain;
-  width: 100%;
-  background-image: url("../../img/spikes.gif");
-}
-
 .scoreKeeper {
   font-size: 5rem;
   font-weight: bold;

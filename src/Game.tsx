@@ -7,6 +7,10 @@ import BottomObstacle from "./components/Obstacles/BottomObstacle";
 import ScoreKeeper from "./components/ScoreKeeper/ScoreKeeper";
 import StartMenu from "./components/menu/StartMenu";
 import style from "./components/styles/StaticStyling.module.css";
+import UIFx from "uifx";
+import flipSoundFile from "./sounds/flip.mp3";
+import backMusicFile from "./sounds/background-music.mp3";
+import gameOverSoundFile from "./sounds/game-over-sound.mp3";
 
 const GRAVITY = 20;
 
@@ -18,12 +22,18 @@ const BIRD_ROTATION_SPEED = GRAVITY / 10;
 const JUMP_HEIGHT = BIRD_SIZE * 1.5;
 const BIRID_LEFT_POSITION = BIRD_SIZE;
 
-const GAP = BIRD_SIZE * 3;
+const GAP = BIRD_SIZE * 4;
 const OBSTACLE_WIDTH = BIRD_SIZE * 3;
 const OBSTACLES_SPEED = 15;
 
 const MENU_HEIGHT = BOARD_HEIGHT / 3;
 const MENU_WIDTH = BOARD_WIDTH / 5;
+
+const flipSound = new UIFx(flipSoundFile);
+// const flipSound = new Audio(flipSoundFile);
+const music = new Audio(backMusicFile);
+
+const gameOverSound = new UIFx(gameOverSoundFile);
 
 function Game() {
   const minObstacleHeight = 400;
@@ -236,6 +246,9 @@ function Game() {
 
   useEffect(() => {
     if (gameHasOver) {
+      gameOverSound.play();
+      music.pause();
+      music.currentTime = 0;
       setGameHasStarted(false);
       setMenuVisibility("flex");
     } else if (!gameHasOver) {
@@ -247,6 +260,7 @@ function Game() {
     if (!gameHasStarted) {
       setMenuVisibility("flex");
     } else {
+      music.play();
       setMenuVisibility("none");
     }
   }, [gameHasStarted]);
@@ -268,6 +282,9 @@ function Game() {
   }, [gameHasStarted, birdRotation, birdTopPosition]);
 
   const handleClick = () => {
+    if (!gameHasOver && gameHasStarted) {
+      flipSound.play();
+    }
     let newBirdTopPosition = birdTopPosition - JUMP_HEIGHT;
     if (!gameHasOver && gameHasStarted) {
       if (newBirdTopPosition < 0) {
