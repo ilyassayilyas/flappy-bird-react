@@ -12,7 +12,6 @@ const GRAVITY = 20;
 
 const BOARD_HEIGHT = visualViewport.height;
 const BOARD_WIDTH = visualViewport.width;
-const SPIKES_HEIGHT = BOARD_HEIGHT / 10;
 
 const BIRD_SIZE = BOARD_HEIGHT / 10;
 const BIRD_ROTATION_SPEED = GRAVITY / 10;
@@ -157,7 +156,6 @@ function Game() {
       (isFirstBottomCollision || isFirstTopCollision)
     ) {
       setGameHasOver(true);
-      setGameHasStarted(false);
     }
   }, [
     obstacleLeft,
@@ -181,7 +179,6 @@ function Game() {
       (isSecondBottomCollision || isSecondTopCollision)
     ) {
       setGameHasOver(true);
-      setGameHasStarted(false);
     }
   }, [
     secondObstacleLeft,
@@ -205,7 +202,6 @@ function Game() {
       (isThirdBottomCollision || isThirdTopCollision)
     ) {
       setGameHasOver(true);
-      setGameHasStarted(false);
     }
   }, [
     thirdObstacleLeft,
@@ -229,7 +225,6 @@ function Game() {
       (isFourthBottomCollision || isFourthTopCollision)
     ) {
       setGameHasOver(true);
-      setGameHasStarted(false);
     }
   }, [
     fourthObstacleLeft,
@@ -241,8 +236,10 @@ function Game() {
 
   useEffect(() => {
     if (gameHasOver) {
+      setGameHasStarted(false);
       setMenuVisibility("flex");
-      setScore(0);
+    } else if (!gameHasOver) {
+      setMenuVisibility("none");
     }
   }, [gameHasOver]);
 
@@ -273,8 +270,8 @@ function Game() {
   const handleClick = () => {
     let newBirdTopPosition = birdTopPosition - JUMP_HEIGHT;
     if (!gameHasOver && gameHasStarted) {
-      if (newBirdTopPosition < SPIKES_HEIGHT / 4) {
-        setBirdTopPosition(SPIKES_HEIGHT / 4);
+      if (newBirdTopPosition < 0) {
+        setBirdTopPosition(0);
         setBirdRotation(-45);
       } else {
         setBirdTopPosition(newBirdTopPosition);
@@ -282,20 +279,29 @@ function Game() {
       }
     }
   };
+  const restartGame = () => {
+    setScore(0);
+    setBirdTopPosition(BOARD_HEIGHT / 2 - BIRD_SIZE);
+  };
 
   const handleButtonClick = () => {
     if (!gameHasStarted && !gameHasOver) {
       setGameHasStarted(true);
     }
     if (gameHasOver) {
+      setObstacleLeft(BOARD_WIDTH + OBSTACLE_WIDTH);
+      setSecondObstacleLeft(BOARD_WIDTH + 2.75 * OBSTACLE_WIDTH);
+      setThirdObstacleLeft(BOARD_WIDTH + 4.5 * OBSTACLE_WIDTH);
+      setFourthObstacleLeft(BOARD_WIDTH + 6.25 * OBSTACLE_WIDTH);
       setGameHasOver(false);
       setGameHasStarted(true);
+      restartGame();
     }
   };
 
   return (
     <div className="Game" onClick={handleClick}>
-      <Board boardHeight={BOARD_HEIGHT} spikesHeight={SPIKES_HEIGHT}>
+      <Board boardHeight={BOARD_HEIGHT}>
         <TopObstacle
           height={topObstacleHeight}
           width={OBSTACLE_WIDTH}

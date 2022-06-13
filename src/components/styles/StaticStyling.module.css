@@ -27,24 +27,41 @@
   position: relative;
   display: flex;
   width: 100%;
-  background-image: linear-gradient(to right, #00b4db, #0083b0);
+}
+
+.backAnimation {
+  transform: rotateY(180deg);
+  background: url(https://static.radulescu.me/examples/clouds/clouds1000.png);
+  background: url(https://static.radulescu.me/examples/clouds/clouds1000.png) 0
+      200px,
+    url(https://static.radulescu.me/examples/clouds/clouds1200_1.png) 0 300px,
+    url(https://static.radulescu.me/examples/clouds/clouds1000_blur3.png) 100px
+      250px;
+  animation: wind 20s linear infinite;
+  background-color: #00b4db;
+  overflow: hidden;
+  z-index: -50;
+  position: absolute;
+  height: 100%;
+  width: 100%;
 }
 
 .topSpikes {
   position: absolute;
   top: 0;
   left: 0;
-  background-size: contain;
-  width: 100%;
   background-image: url("../../img/spikes.gif");
+  background-size: contain;
+  background-repeat: repeat-x;
+  width: 100%;
 }
 
 .bottomSpikes {
   z-index: 1;
   position: absolute;
   bottom: 0;
-  transform: rotate(180deg);
   left: 0;
+  transform: rotate(180deg);
   background-size: contain;
   width: 100%;
   background-image: url("../../img/spikes.gif");
@@ -99,4 +116,13 @@
 
 .menuBtn:active {
   font-size: 2.5rem;
+}
+
+@keyframes wind {
+  0% {
+    background-position: 0 200px, 0 300px, 100px 250px;
+  }
+  100% {
+    background-position: 1000px 200px, 1200px 300px, 1100px 250px;
+  }
 }

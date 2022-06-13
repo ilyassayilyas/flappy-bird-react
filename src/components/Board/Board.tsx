@@ -10,25 +10,14 @@ const backgroundGradientDynamicStyling = (props: BoardProps) => ({
   height: `${props.boardHeight}px`,
 });
 
-const spikesDynamicStyling = (props: BoardProps) => ({
-  height: `${props.spikesHeight}px`,
-});
-
 const Board = (props: BoardProps) => {
   return (
     <div
       className={style.backgroundGradient}
       style={backgroundGradientDynamicStyling(props)}
     >
-      <div
-        className={style.topSpikes}
-        style={spikesDynamicStyling(props)}
-      ></div>
+      <div className={style.backAnimation}> </div>
       {props.children}
-      <div
-        className={style.bottomSpikes}
-        style={spikesDynamicStyling(props)}
-      ></div>
     </div>
   );
 };
